@@ -3,10 +3,21 @@ import pdfplumber
 import re
 from tqdm import tqdm
 
+
 def should_combine(line1, line2):
+    """Returns True if the two lines should be combined, False otherwise."""
     return not re.search(r'[.?!;:\-–—]$', line1.strip())
 
+
 def clean_extracted_text(text):
+    """Cleans the extracted text by combining consecutive lines that end with a punctuation mark.
+
+    Args:
+        text: The extracted text.
+
+    Returns:
+        The cleaned text.
+    """
     lines = text.split('\n')
     cleaned_lines = []
 
@@ -18,7 +29,16 @@ def clean_extracted_text(text):
 
     return '\n\n'.join(cleaned_lines)
 
+
 def format_table_as_markdown(table):
+    """Formats a table as markdown.
+
+    Args:
+        table: The table to format.
+
+    Returns:
+        The formatted table as markdown.
+    """
     markdown_table = []
     for row in table:
         # Convert None to an empty string
@@ -28,7 +48,14 @@ def format_table_as_markdown(table):
     header_separator = '| ' + ' | '.join(['---'] * len(table[0])) + ' |'
     return header_separator + '\n' + '\n'.join(markdown_table)
 
+
 def pdf_to_markdown(pdf_path, markdown_path):
+    """Converts a PDF file to markdown.
+
+    Args:
+        pdf_path: The path to the PDF file.
+        markdown_path: The path to the markdown file.
+    """
     with pdfplumber.open(pdf_path) as pdf:
         extracted_text = ""
         for page in tqdm(pdf.pages, desc="Extracting text and tables from pages"):
@@ -43,6 +70,7 @@ def pdf_to_markdown(pdf_path, markdown_path):
 
         with open(markdown_path, 'w', encoding='utf-8') as markdown_file:
             markdown_file.write(cleaned_text)
+
 
 # List files in the 'pdfs' directory
 pdf_directory = "pdfs"
