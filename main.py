@@ -31,6 +31,13 @@ def validate_pdf(pdf_path):
         return False
 
 def pdf_to_markdown(pdf_path, markdown_path):
+    # Check if the markdown file already exists
+    if os.path.exists(markdown_path):
+        overwrite = input(f"{markdown_path} already exists. Do you want to overwrite it? (y/n): ")
+        if overwrite.lower() != 'y':
+            print("Skipping conversion.")
+            return
+
     with pdfplumber.open(pdf_path) as pdf:
         extracted_text = ""
         for page in tqdm(pdf.pages, desc="Extracting text from pages"):
@@ -54,11 +61,20 @@ for i, pdf_file in enumerate(pdf_files):
         valid_pdf_files.append(pdf_file)
         print(f"{len(valid_pdf_files)}. {pdf_file}")
 
-file_index = int(input("Enter the file number: ")) - 1
+# Validate user input
+while True:
+    try:
+        file_index = int(input("Enter the file number: ")) - 1
+        if 0 <= file_index < len(valid_pdf_files):
+            break
+        else:
+            print("Invalid input. Please enter a number corresponding to the listed files.")
+    except ValueError:
+        print("Invalid input. Please enter a number.")
+
 selected_pdf = valid_pdf_files[file_index]
 
 pdf_path = os.path.join(pdf_directory, selected_pdf)
 markdown_path = selected_pdf.replace(".pdf", ".md")
 
 pdf_to_markdown(pdf_path, markdown_path)
-
