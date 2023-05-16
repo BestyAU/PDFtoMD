@@ -23,7 +23,10 @@ def validate_pdf(pdf_path):
         with pdfplumber.open(pdf_path) as pdf:
             pass
         return True
-    except:
+    except FileNotFoundError:
+        print(f"{pdf_path} does not exist.")
+        return False
+    except pdfplumber.PDFSyntaxError:
         print(f"Could not open {pdf_path} as a PDF file.")
         return False
 
@@ -58,3 +61,4 @@ pdf_path = os.path.join(pdf_directory, selected_pdf)
 markdown_path = selected_pdf.replace(".pdf", ".md")
 
 pdf_to_markdown(pdf_path, markdown_path)
+
